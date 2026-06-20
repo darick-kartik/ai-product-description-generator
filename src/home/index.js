@@ -1,0 +1,12 @@
+export { default as Hero } from "./Hero";
+export { default as DashboardPreview } from "./DashboardPreview";
+export { default as TrustedCompanies } from "./TrustedCompanies";
+export { default as Features } from "./Features";
+export { default as HowItWorks } from "./HowItWorks";
+export { default as Statistics } from "./Statistics";
+export { default as Testimonials } from "./Testimonials";
+export { default as PricingPreview } from "./PricingPreview";
+export { default as FAQ } from "./FAQ";
+export { default as CTA } from "./CTA";
+export { default as AboutSection } from "./AboutSection";
+export { default as ContactSection } from "./ContactSection";

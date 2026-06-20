@@ -1,0 +1,12 @@
+export { default as HomePage } from "./HomePage";
+export { default as GeneratorPage } from "./GeneratorPage";
+export { default as DashboardPage } from "./DashboardPage";
+export { default as TemplatesPage } from "./TemplatesPage";
+export { default as HistoryPage } from "./HistoryPage";
+export { default as PricingPage } from "./PricingPage";
+export { default as AboutPage } from "./AboutPage";
+export { default as ContactPage } from "./ContactPage";
+export { default as LoginPage } from "./LoginPage";
+export { default as SignupPage } from "./SignupPage";
+export { default as SettingsPage } from "./SettingsPage";
+export { default as NotFoundPage } from "./NotFoundPage";

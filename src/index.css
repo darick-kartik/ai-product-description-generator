@@ -1,0 +1,163 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================
+   BASE
+=========================== */
+
+@layer base {
+  body {
+    margin: 0;
+    min-width: 320px;
+    font-family: "Inter", sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @apply bg-white text-gray-900 dark:bg-[#020617] dark:text-white;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ===========================
+   BACKGROUND
+=========================== */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+}
+
+.dark body::before {
+  background:
+    radial-gradient(circle at top, rgba(99,102,241,.18), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(6,182,212,.12), transparent 35%),
+    #020617;
+}
+
+.light body::before {
+  background:
+    radial-gradient(circle at top, rgba(99,102,241,.08), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(6,182,212,.06), transparent 35%),
+    #ffffff;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: .25;
+}
+
+/* ===========================
+   COMPONENTS
+=========================== */
+
+@layer components {
+
+  .container-app {
+    @apply max-w-7xl mx-auto px-5 sm:px-6 lg:px-8;
+  }
+
+  .glass-card {
+    @apply rounded-3xl backdrop-blur-xl border transition-all duration-300;
+  }
+
+  .dark .glass-card {
+    @apply bg-[#0f172a] border-gray-800 text-white;
+  }
+
+  .light .glass-card {
+    @apply bg-white border-gray-200 text-black;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-5xl font-bold tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-lg leading-8 max-w-3xl mx-auto text-gray-600 dark:text-gray-300;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-4 py-1 text-sm font-medium;
+  }
+
+  .dark .badge {
+    @apply bg-indigo-500/10 text-indigo-400 border border-indigo-500/30;
+  }
+
+  .light .badge {
+    @apply bg-indigo-100 text-indigo-700 border border-indigo-200;
+  }
+
+  .primary-btn {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition;
+  }
+
+  .secondary-btn {
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold border transition;
+  }
+
+  .dark .secondary-btn {
+    @apply border-gray-700 bg-[#1e293b] text-white hover:bg-gray-800;
+  }
+
+  .light .secondary-btn {
+    @apply border-gray-300 bg-gray-100 text-black hover:bg-gray-200;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl px-4 py-3 outline-none transition border;
+  }
+
+  .dark .input-field {
+    @apply bg-[#1e293b] border-gray-700 text-white placeholder-gray-400;
+  }
+
+  .light .input-field {
+    @apply bg-white border-gray-300 text-black placeholder-gray-500;
+  }
+}
