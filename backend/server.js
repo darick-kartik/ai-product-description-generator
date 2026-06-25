@@ -1,3 +1,4 @@
+const errorHandler = require("./middleware/errorMiddleware");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -17,6 +18,13 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/products", productRoutes);
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
