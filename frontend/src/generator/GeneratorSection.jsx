@@ -14,11 +14,8 @@ const GeneratorSection = () => {
     setLoading(true);
 
     const response = await api.post("/products", {
-      productName: product,
-      category: "General",
-      tone: "Professional",
-      description: `Premium AI generated description for: ${product}`,
-    });
+  productName: product,
+});
 
     setOutput(response.data.data.description);
   } catch (error) {

@@ -27,14 +27,33 @@ const getProductById = (req, res) => {
 };
 
 const createProduct = (req, res) => {
-  const { productName, category, tone, description } = req.body;
+  const { productName, category = "General", tone = "Professional" } = req.body;
 
-  if (!productName || !category || !tone || !description) {
+  if (!productName) {
     return res.status(400).json({
       success: false,
-      message: "All fields are required",
+      message: "Product name is required",
     });
   }
+
+  const generatedDescription = `Discover our premium ${productName}, crafted with exceptional quality and modern design. Perfect for customers looking for style, durability, and outstanding performance.`;
+
+  const newProduct = {
+    id: products.length + 1,
+    productName,
+    category,
+    tone,
+    description: generatedDescription,
+  };
+
+  products.push(newProduct);
+
+  res.status(201).json({
+    success: true,
+    message: "Product generated successfully",
+    data: newProduct,
+  });
+};
 
   const newProduct = {
     id: products.length + 1,
