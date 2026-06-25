@@ -55,21 +55,6 @@ const createProduct = (req, res) => {
   });
 };
 
-  const newProduct = {
-    id: products.length + 1,
-    productName,
-    category,
-    tone,
-    description,
-  };
-
-  products.push(newProduct);
-
-  res.status(201).json({
-    success: true,
-    message: "Product created successfully",
-    data: newProduct,
-  });
 
 const updateProduct = (req, res) => {
   const id = parseInt(req.params.id);
