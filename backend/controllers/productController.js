@@ -70,7 +70,6 @@ const createProduct = (req, res) => {
     message: "Product created successfully",
     data: newProduct,
   });
-};
 
 const updateProduct = (req, res) => {
   const id = parseInt(req.params.id);
