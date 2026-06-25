@@ -1,22 +1,33 @@
 import  { useState } from "react";
 import { Button, Input, Loader } from "../components/ui";
+import api from "../services/api";
 
 const GeneratorSection = () => {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState("");
   const [output, setOutput] = useState("");
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+  if (!product.trim()) return;
+
+  try {
     setLoading(true);
 
-    setTimeout(() => {
-      setOutput(
-        `Premium AI generated description for: ${product}`
-      );
-      setLoading(false);
-    }, 2000);
-  };
+    const response = await api.post("/products", {
+      productName: product,
+      category: "General",
+      tone: "Professional",
+      description: `Premium AI generated description for: ${product}`,
+    });
 
+    setOutput(response.data.data.description);
+  } catch (error) {
+    console.error(error);
+    setOutput("Something went wrong!");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
