@@ -27,7 +27,18 @@ const HistorySection = () => {
 
   loadHistory();
 }, []);
+const handleDelete = async (id) => {
+  try {
+    await api.delete(`/products/${id}`);
 
+    setHistoryData((prev) => prev.filter((item) => item._id !== id));
+
+    toast.success("Product deleted successfully");
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to delete product");
+  }
+};
  
 
   const handleAction = (message) => {
@@ -109,7 +120,7 @@ const HistorySection = () => {
                 {historyData.length > 0 ? (
                   historyData.map((item, index) => (
                     <motion.tr
-                      key={item.id}
+                      key={item._id}
                       initial={{ opacity: 0, y: 25 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
@@ -127,10 +138,16 @@ const HistorySection = () => {
                       </td>
 
                       <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-muted">
-                          <Calendar size={16} />
-                          Today
-                        </div>
+                        <td className="px-6 py-5">
+  <div className="flex items-center gap-2 text-muted">
+    <Calendar size={16} />
+    {new Date(item.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })}
+  </div>
+</td>
                       </td>
 
                       <td className="px-6 py-5">
@@ -166,13 +183,11 @@ const HistorySection = () => {
                           </button>
 
                           <button
-                            onClick={() =>
-                              handleAction("History deleted")
-                            }
+                            onClick={() => handleDelete(item._id)}
                             className="rounded-xl border border-border p-3 transition hover:border-red-500 hover:text-red-500"
-                          >
-                            <Trash2 size={17} />
-                          </button>
+                                  >
+  <Trash2 size={17} />
+</button>
                         </div>
                       </td>
                     </motion.tr>
