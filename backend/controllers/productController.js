@@ -1,129 +1,188 @@
-const products = require("../data/products");
+const Product = require("../models/Product");
 
-const getAllProducts = (req, res) => {
-  res.status(200).json({
-    success: true,
-    count: products.length,
-    data: products,
-  });
-};
+// Get All Products
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
 
-const getProductById = (req, res) => {
-  const id = parseInt(req.params.id);
-
-  const product = products.find((item) => item.id === id);
-
-  if (!product) {
-    return res.status(404).json({
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Product not found",
+      message: error.message,
     });
   }
-
-  res.status(200).json({
-    success: true,
-    data: product,
-  });
 };
 
-const createProduct = (req, res) => {
-  const { productName, category = "General", tone = "Professional" } = req.body;
+// Get Product By ID
+const getProductById = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
 
-  if (!productName) {
-    return res.status(400).json({
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Product name is required",
+      message: error.message,
     });
   }
-
-  const generatedDescription = `Discover our premium ${productName}, crafted with exceptional quality and modern design. Perfect for customers looking for style, durability, and outstanding performance.`;
-
-  const newProduct = {
-    id: products.length + 1,
-    productName,
-    category,
-    tone,
-    description: generatedDescription,
-  };
-
-  products.push(newProduct);
-
-  res.status(201).json({
-    success: true,
-    message: "Product generated successfully",
-    data: newProduct,
-  });
 };
 
+// Create Product
+const createProduct = async (req, res) => {
+  try {
+    const {
+      productName,
+      category = "General",
+      tone = "Professional",
+    } = req.body;
 
-const updateProduct = (req, res) => {
-  const id = parseInt(req.params.id);
+    if (!productName) {
+      return res.status(400).json({
+        success: false,
+        message: "Product name is required",
+      });
+    }
 
-  const product = products.find((item) => item.id === id);
+    const generatedDescription = `Discover our premium ${productName}, crafted with exceptional quality and modern design. Perfect for customers looking for style, durability, and outstanding performance.`;
 
-  if (!product) {
-    return res.status(404).json({
+    const product = await Product.create({
+      productName,
+      category,
+      tone,
+      description: generatedDescription,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Product not found",
+      message: error.message,
     });
   }
-
-  const { productName, category, tone, description } = req.body;
-
-  product.productName = productName || product.productName;
-  product.category = category || product.category;
-  product.tone = tone || product.tone;
-  product.description = description || product.description;
-
-  res.status(200).json({
-    success: true,
-    message: "Product updated successfully",
-    data: product,
-  });
 };
 
-const deleteProduct = (req, res) => {
-  const id = parseInt(req.params.id);
+// Update Product
+const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
-  const index = products.findIndex((item) => item.id === id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Product not found",
+      message: error.message,
     });
   }
-
-  const deletedProduct = products.splice(index, 1);
-
-  res.status(200).json({
-    success: true,
-    message: "Product deleted successfully",
-    data: deletedProduct[0],
-  });
 };
 
-const searchProducts = (req, res) => {
-  const query = req.query.q;
+// Delete Product
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
 
-  if (!query) {
-    return res.status(400).json({
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Search query is required",
+      message: error.message,
     });
   }
+};
 
-  const filteredProducts = products.filter((product) =>
-    product.productName.toLowerCase().includes(query.toLowerCase()) ||
-    product.category.toLowerCase().includes(query.toLowerCase()) ||
-    product.tone.toLowerCase().includes(query.toLowerCase())
-  );
+// Search Products
+const searchProducts = async (req, res) => {
+  try {
+    const query = req.query.q;
 
-  res.status(200).json({
-    success: true,
-    count: filteredProducts.length,
-    data: filteredProducts,
-  });
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query is required",
+      });
+    }
+
+    const products = await Product.find({
+      $or: [
+        {
+          productName: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          category: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          tone: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
