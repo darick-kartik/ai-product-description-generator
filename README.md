@@ -86,17 +86,13 @@ This project uses **MongoDB Atlas** as the primary database.
 
 ---
 
-# 📊 Database Schema
+## 📊 Database Schema
 
 The application stores product information in a single **Product** collection.
 
-> **Schema Diagram**
+### Schema Diagram
 
-Save your uploaded diagram in the repository (for example in an `assets` folder) and reference it here:
-
-```md
 ![Database Schema](assets/W5_SchemaDiagram_TBI-26101240.png)
-```
 
 ---
 
