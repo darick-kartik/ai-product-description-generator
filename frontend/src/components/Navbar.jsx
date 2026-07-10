@@ -1,23 +1,38 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Sparkles } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
-
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Generator", path: "/generator" },
-  { name: "Dashboard", path: "/dashboard" },
-  { name: "Templates", path: "/templates" },
-  { name: "Pricing", path: "/pricing" },
-  { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
-];
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { theme, toggleTheme } = useAppContext();
+  const { isAuthenticated, logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const navLinks = [
+    { name: "Home", path: "/" },
+
+    ...(isAuthenticated
+      ? [
+          { name: "Generator", path: "/generator" },
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Templates", path: "/templates" },
+        ]
+      : []),
+
+    { name: "Pricing", path: "/pricing" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   return (
     <header
@@ -69,7 +84,6 @@ const Navbar = () => {
         {/* Desktop Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
 
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className={`px-3 py-2 rounded-xl border text-sm transition ${
@@ -81,23 +95,34 @@ const Navbar = () => {
             {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
           </button>
 
-          <Link
-            to="/login"
-            className={`px-5 py-2.5 rounded-xl transition ${
-              theme === "dark"
-                ? "bg-gray-800 hover:bg-gray-700"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            Login
-          </Link>
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className={`px-5 py-2.5 rounded-xl transition ${
+                  theme === "dark"
+                    ? "bg-gray-800 hover:bg-gray-700"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                Login
+              </Link>
 
-          <Link
-            to="/signup"
-            className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
-          >
-            Get Started
-          </Link>
+              <Link
+                to="/signup"
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -143,7 +168,6 @@ const Navbar = () => {
                 </NavLink>
               ))}
 
-              {/* Mobile Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className={`mt-4 px-4 py-3 rounded-xl border transition ${
@@ -159,25 +183,39 @@ const Navbar = () => {
 
               <div className="mt-6 flex flex-col gap-3">
 
-                <Link
-                  to="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className={`px-4 py-3 rounded-xl text-center transition ${
-                    theme === "dark"
-                      ? "bg-gray-800"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  Login
-                </Link>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMenuOpen(false);
+                    }}
+                    className="px-4 py-3 rounded-xl bg-red-500 text-white"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className={`px-4 py-3 rounded-xl text-center transition ${
+                        theme === "dark"
+                          ? "bg-gray-800"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      Login
+                    </Link>
 
-                <Link
-                  to="/signup"
-                  onClick={() => setMenuOpen(false)}
-                  className="px-4 py-3 rounded-xl bg-indigo-600 text-white text-center"
-                >
-                  Get Started
-                </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setMenuOpen(false)}
+                      className="px-4 py-3 rounded-xl bg-indigo-600 text-white text-center"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
 
               </div>
             </div>

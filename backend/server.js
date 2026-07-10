@@ -1,6 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const authRoutes = require("./routes/authRoutes");
+const session = require("express-session");
+const passport = require("passport");
+require("./config/passport");
 
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorMiddleware");
@@ -12,9 +16,25 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+ app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use("/api/auth", authRoutes);
 
 // Home Route
 app.get("/", (req, res) => {

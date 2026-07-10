@@ -1,15 +1,71 @@
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { Mail, Lock, Github } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
+import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
+
 const LoginSection = () => {
   const { register, handleSubmit } = useForm();
 
-  const onSubmit = () => {
-    toast.success("Login successful");
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
+
+  // Prevent Google callback from running multiple times
+  const hasProcessed = useRef(false);
+
+  useEffect(() => {
+    if (hasProcessed.current) return;
+
+    const token = searchParams.get("token");
+
+    if (!token) return;
+
+    hasProcessed.current = true;
+
+    login(
+      {
+        name: searchParams.get("name"),
+        email: searchParams.get("email"),
+        provider: searchParams.get("provider"),
+      },
+      token
+    );
+
+    toast.success("Logged in with Google");
+
+    navigate("/dashboard", {
+      replace: true,
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await loginUser(data);
+
+      if (response.success) {
+        login(response.user, response.token);
+
+        toast.success(response.message);
+
+        navigate("/dashboard");
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -95,12 +151,22 @@ const LoginSection = () => {
           </div>
 
           <div className="space-y-4">
-            <button className="secondary-btn w-full gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href =
+                  "http://localhost:5000/api/auth/google";
+              }}
+              className="secondary-btn w-full gap-3"
+            >
               <FcGoogle size={22} />
               Continue with Google
             </button>
 
-            <button className="secondary-btn w-full gap-3">
+            <button
+              type="button"
+              className="secondary-btn w-full gap-3"
+            >
               <Github size={20} />
               Continue with GitHub
             </button>

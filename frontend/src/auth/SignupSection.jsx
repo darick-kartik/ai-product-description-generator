@@ -4,14 +4,43 @@ import { User, Mail, Lock, Github } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 const SignupSection = () => {
   const { register, handleSubmit, reset } = useForm();
 
-  const onSubmit = () => {
-    toast.success("Account created successfully!");
-    reset();
-  };
+const navigate = useNavigate();
+const { login } = useAuth();
+  const onSubmit = async (data) => {
+  if (data.password !== data.confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
+
+  try {
+    const response = await registerUser({
+  name: data.name,
+  email: data.email,
+  password: data.password,
+});
+
+    if (response.success) {
+      login(response.user, response.token);
+
+      toast.success(response.message);
+
+      reset();
+
+      navigate("/dashboard");
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error("Something went wrong");
+  }
+};
 
   return (
     <section className="flex min-h-[calc(100vh-80px)] items-center justify-center py-20">
@@ -120,10 +149,17 @@ const SignupSection = () => {
           </div>
 
           <div className="space-y-4">
-            <button className="secondary-btn w-full gap-3">
-              <FcGoogle size={22} />
-              Continue with Google
-            </button>
+           <button
+  onClick={() => {
+    window.location.href =
+      "http://localhost:5000/api/auth/google";
+  }}
+  type="button"
+  className="secondary-btn w-full gap-3"
+>
+  <FcGoogle size={22} />
+  Continue with Google
+</button>
 
             <button className="secondary-btn w-full gap-3">
               <Github size={20} />

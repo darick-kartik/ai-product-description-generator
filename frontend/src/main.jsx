@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./context/AuthContext";
 
 import App from "./App";
 import { AppProvider } from "./context/AppContext";
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AppProvider>
+        <AuthProvider>
         <App />
 
         <Toaster
@@ -42,6 +44,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             },
           }}
         />
+      </AuthProvider>
       </AppProvider>
     </BrowserRouter>
   </React.StrictMode>
