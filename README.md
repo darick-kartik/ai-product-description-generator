@@ -1,6 +1,6 @@
 # 🚀 AI Product Description Generator
 
-A modern AI-powered web application that generates professional product descriptions using a clean and responsive interface. The project follows a full-stack architecture with a React frontend, Express backend, and MongoDB Atlas database for persistent storage.
+A modern AI-powered web application that generates professional product descriptions using a clean and responsive interface. The project follows a full-stack architecture with a React frontend, Express backend, MongoDB Atlas database, and secure user authentication using JWT and Google OAuth.
 
 ---
 
@@ -13,6 +13,11 @@ A modern AI-powered web application that generates professional product descript
 - ✏️ Update Product Details
 - 🗑️ Delete Products
 - 💾 Persistent MongoDB Atlas Storage
+- 🔐 User Authentication (JWT)
+- 🌐 Google OAuth Login
+- 🛡️ Protected Routes & APIs
+- ✅ Input Validation
+- 🚦 Rate Limiting
 - 📱 Fully Responsive UI
 - 🌙 Dark Theme Interface
 - ⚡ RESTful API Architecture
@@ -28,17 +33,30 @@ A modern AI-powered web application that generates professional product descript
 - Framer Motion
 - Axios
 - React Hot Toast
+- React Hook Form
+- React Router DOM
 - Lucide React
 
 ## Backend
 
 - Node.js
 - Express.js
+- Passport.js
+- JWT (jsonwebtoken)
+- bcryptjs
+- express-validator
+- express-rate-limit
 
 ## Database
 
 - MongoDB Atlas
 - Mongoose ODM
+
+## Authentication
+
+- JWT Authentication
+- Google OAuth 2.0
+- Passport Google OAuth Strategy
 
 ## Version Control
 
@@ -49,7 +67,7 @@ A modern AI-powered web application that generates professional product descript
 
 # 📂 Project Structure
 
-```
+```text
 AI-Product-Description-Generator
 │
 ├── frontend
@@ -60,9 +78,9 @@ AI-Product-Description-Generator
 ├── backend
 │   ├── config
 │   ├── controllers
+│   ├── middleware
 │   ├── models
 │   ├── routes
-│   ├── middleware
 │   ├── server.js
 │   ├── .env.example
 │   └── package.json
@@ -82,13 +100,13 @@ This project uses **MongoDB Atlas** as the primary database.
 - Easy integration with Node.js
 - Cloud-hosted free tier
 - Scalable architecture
-- Ideal for storing generated product descriptions
+- Ideal for storing generated product descriptions and user accounts
 
 ---
 
 ## 📊 Database Schema
 
-The application stores product information in a single **Product** collection.
+The application stores product information in a **Product** collection.
 
 ### Schema Diagram
 
@@ -96,18 +114,44 @@ The application stores product information in a single **Product** collection.
 
 ---
 
+# 🔐 Authentication & Security
+
+The application implements secure authentication using:
+
+- JWT Authentication
+- Google OAuth 2.0 Login
+- Password Hashing with bcrypt
+- Protected Backend APIs
+- Protected Frontend Routes
+- Input Validation using express-validator
+- Rate Limiting using express-rate-limit
+- CORS Configuration
+
+---
+
 # ⚙️ Environment Variables
 
 Create a `.env` file inside the backend folder.
 
-```
-MONGO_URI=your_mongodb_connection_string
+```env
 PORT=5000
+
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_jwt_secret
+
+GOOGLE_CLIENT_ID=your_google_client_id
+
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+
+FRONTEND_URL=http://localhost:5173
 ```
 
 A sample configuration is available in:
 
-```
+```text
 backend/.env.example
 ```
 
@@ -141,25 +185,39 @@ npm run dev
 
 # 📡 API Endpoints
 
+## Authentication APIs
+
 | Method | Endpoint | Description |
 |---------|----------|-------------|
-| GET | /api/products | Get all products |
-| GET | /api/products/:id | Get product by ID |
-| GET | /api/products/search?q= | Search products |
-| POST | /api/products | Create product |
-| PUT | /api/products/:id | Update product |
-| DELETE | /api/products/:id | Delete product |
+| POST | /api/auth/register | Register User |
+| POST | /api/auth/login | Login User |
+| GET | /api/auth/google | Google OAuth Login |
+
+---
+
+## Product APIs
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/products | Get All Products |
+| GET | /api/products/:id | Get Product by ID |
+| GET | /api/products/search?q= | Search Products |
+| POST | /api/products | Create Product *(Protected)* |
+| PUT | /api/products/:id | Update Product *(Protected)* |
+| DELETE | /api/products/:id | Delete Product *(Protected)* |
 
 ---
 
 # 🔮 Future Improvements
 
 - AI API Integration
-- User Authentication
 - Product Categories
 - Export to PDF
 - Favorites
 - Dashboard Analytics
+- Email Verification
+- Password Reset
+- User Profile Management
 
 ---
 
@@ -167,7 +225,7 @@ npm run dev
 
 **Kartik Chauhan**
 
-Intern ID: **TBI-26101240**
+**Intern ID:** TBI-26101240
 
 Graphic Era University
 
@@ -175,4 +233,4 @@ Graphic Era University
 
 # ⭐ Acknowledgement
 
-Developed as part of the AI-Assisted Full Stack Web Development Internship.
+Developed as part of the **AI-Assisted Full Stack Web Development Internship**.
