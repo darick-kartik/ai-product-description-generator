@@ -137,8 +137,7 @@ const handleDelete = async (id) => {
                         {item.category}
                       </td>
 
-                      <td className="px-6 py-5">
-                        <td className="px-6 py-5">
+                     <td className="px-6 py-5">
   <div className="flex items-center gap-2 text-muted">
     <Calendar size={16} />
     {new Date(item.createdAt).toLocaleDateString("en-IN", {
@@ -148,7 +147,6 @@ const handleDelete = async (id) => {
     })}
   </div>
 </td>
-                      </td>
 
                       <td className="px-6 py-5">
                         {item.description

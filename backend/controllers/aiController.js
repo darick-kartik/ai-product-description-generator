@@ -1,4 +1,5 @@
 const OpenAI = require("openai");
+const Product = require("../models/Product");
 
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
@@ -49,8 +50,7 @@ Call To Action:
       messages: [
         {
           role: "system",
-          content:
-            "You are a professional e-commerce content writer.",
+          content: "You are a professional e-commerce content writer.",
         },
         {
           role: "user",
@@ -61,9 +61,19 @@ Call To Action:
       max_tokens: 500,
     });
 
+    const generatedDescription = completion.choices[0].message.content;
+
+    // Save to MongoDB
+    const savedProduct = await Product.create({
+      productName,
+      category,
+      description: generatedDescription,
+    });
+
     res.status(200).json({
       success: true,
-      description: completion.choices[0].message.content,
+      description: generatedDescription,
+      data: savedProduct,
     });
   } catch (error) {
     console.error("Groq Error:", error);
