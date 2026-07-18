@@ -1,67 +1,105 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Button, Input, Loader } from "../components/ui";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 const GeneratorSection = () => {
   const [loading, setLoading] = useState(false);
+
   const [product, setProduct] = useState("");
+  const [category, setCategory] = useState("");
+  const [features, setFeatures] = useState("");
+
   const [output, setOutput] = useState("");
 
   const handleGenerate = async () => {
-  if (!product.trim()) return;
+    if (!product.trim() || !category.trim() || !features.trim()) {
+      toast.error("Please fill all fields.");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const response = await api.post("/products", {
-  productName: product,
-});
+      const response = await api.post("/ai/generate", {
+        productName: product,
+        category,
+        features,
+      });
 
-    setOutput(response.data.data.description);
-  } catch (error) {
-    console.error(error);
-    setOutput("Something went wrong!");
-  } finally {
-    setLoading(false);
-  }
-};
+      setOutput(response.data.description);
+
+      toast.success("Description generated successfully!");
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to generate description.");
+
+      setOutput("Something went wrong while generating the description.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      {/* LEFT SIDE */}
+      {/* Left Section */}
       <div className="space-y-4">
 
         <Input
           label="Product Name"
           value={product}
           onChange={(e) => setProduct(e.target.value)}
-          placeholder="Enter product name"
+          placeholder="Wireless Bluetooth Headphones"
+        />
+
+        <Input
+          label="Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="Electronics"
+        />
+
+        <Input
+          label="Features"
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
+          placeholder="Bluetooth 5.3, Noise Cancellation, Fast Charging"
         />
 
         <Button onClick={handleGenerate}>
           Generate Description
         </Button>
+
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="
-        rounded-xl border p-4 min-h-[200px]
-        bg-white text-gray-900
-        dark:bg-[#0f172a] dark:text-white
-        border-gray-200 dark:border-gray-700
-      ">
-
+      {/* Right Section */}
+      <div
+        className="
+          rounded-xl
+          border
+          p-4
+          min-h-[350px]
+          bg-white
+          text-gray-900
+          dark:bg-[#0f172a]
+          dark:text-white
+          border-gray-200
+          dark:border-gray-700
+        "
+      >
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <Loader />
           </div>
         ) : (
-          <p className="text-gray-700 dark:text-gray-300">
-            {output || "Generated output will appear here..."}
-          </p>
+          <pre className="whitespace-pre-wrap font-sans text-gray-700 dark:text-gray-300">
+            {output || "Generated product description will appear here..."}
+          </pre>
         )}
-
       </div>
+
     </div>
   );
 };

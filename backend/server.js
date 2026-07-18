@@ -5,7 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const session = require("express-session");
 const passport = require("passport");
 require("./config/passport");
-
+const aiRoutes = require("./routes/aiRoutes");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorMiddleware");
 const productRoutes = require("./routes/productRoutes");
@@ -35,6 +35,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/api/auth", authRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
