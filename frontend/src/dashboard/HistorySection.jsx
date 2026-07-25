@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import api from "../services/api";
 import {
   History,
   Search,
@@ -11,42 +10,118 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
+import api from "../services/api";
+import Loader from "../components/ui/Loader";
+
 const HistorySection = () => {
   const [historyData, setHistoryData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
   const loadHistory = async () => {
+    setLoading(true);
+
     try {
       const response = await api.get("/products");
-      setHistoryData(response.data.data);
+      setHistoryData(response.data.data || []);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load history");
+    } finally {
+      setLoading(false);
     }
   };
 
-  loadHistory();
-}, []);
-const handleDelete = async (id) => {
-  try {
-    await api.delete(`/products/${id}`);
+  useEffect(() => {
+    loadHistory();
+  }, []);
 
-    setHistoryData((prev) => prev.filter((item) => item._id !== id));
+  const filteredHistory = useMemo(() => {
+    return historyData.filter((item) => {
+      const query = search.toLowerCase();
 
-    toast.success("Product deleted successfully");
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to delete product");
-  }
-};
- 
+      return (
+        item.productName?.toLowerCase().includes(query) ||
+        item.category?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query)
+      );
+    });
+  }, [historyData, search]);
 
-  const handleAction = (message) => {
-    toast.success(message);
+  const handleCopy = async (description) => {
+    try {
+      await navigator.clipboard.writeText(description);
+      toast.success("Description copied successfully");
+    } catch (error) {
+      toast.error("Failed to copy description");
+    }
   };
 
-  return (
-    <section className="py-24">
+  const handleDownload = (product) => {
+    const content = `
+Product Name: ${product.productName}
+
+Category: ${product.category}
+
+Description:
+
+${product.description}
+`;
+
+    const blob = new Blob([content], {
+      type: "text/plain",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+   link.download = `${product.productName
+  .replace(/[^a-zA-Z0-9]/g, "_")
+  .toLowerCase()}.txt`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    toast.success("Download started");
+  };
+
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/products/${id}`);
+
+      setHistoryData((prev) =>
+        prev.filter((item) => item._id !== id)
+      );
+
+      toast.success("Product deleted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete product");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-24">
+        <Loader />
+      </div>
+    );
+  }
+
+  return (<section className="py-24">
       <div className="container-app">
         {/* Header */}
         <motion.div
@@ -71,14 +146,16 @@ const handleDelete = async (id) => {
           </p>
         </motion.div>
 
-        {/* Search UI (frontend search will be added later) */}
+        {/* Search */}
         <div className="mx-auto mt-14 max-w-xl">
           <div className="glass-card flex items-center gap-4 px-5 py-4">
             <Search className="text-muted" size={20} />
 
             <input
               type="text"
-              placeholder="Search history..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by product, category or description..."
               className="w-full bg-transparent outline-none placeholder:text-muted"
             />
           </div>
@@ -117,8 +194,8 @@ const handleDelete = async (id) => {
               </thead>
 
               <tbody>
-                {historyData.length > 0 ? (
-                  historyData.map((item, index) => (
+                {filteredHistory.length > 0 ? (
+                  filteredHistory.map((item, index) => (
                     <motion.tr
                       key={item._id}
                       initial={{ opacity: 0, y: 25 }}
@@ -137,16 +214,19 @@ const handleDelete = async (id) => {
                         {item.category}
                       </td>
 
-                     <td className="px-6 py-5">
-  <div className="flex items-center gap-2 text-muted">
-    <Calendar size={16} />
-    {new Date(item.createdAt).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    })}
-  </div>
-</td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2 text-muted">
+                          <Calendar size={16} />
+                          {new Date(item.createdAt).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </div>
+                      </td>
 
                       <td className="px-6 py-5">
                         {item.description
@@ -159,22 +239,19 @@ const handleDelete = async (id) => {
                           98%
                         </span>
                       </td>
-
-                      <td className="px-6 py-5">
+                                            <td className="px-6 py-5">
                         <div className="flex justify-center gap-3">
                           <button
-                            onClick={() =>
-                              handleAction("Copied successfully")
-                            }
+                            onClick={() => handleCopy(item.description||"")}
+                            title="Copy Description"
                             className="rounded-xl border border-border p-3 transition hover:border-primary hover:text-primary"
                           >
                             <Copy size={17} />
                           </button>
 
                           <button
-                            onClick={() =>
-                              handleAction("Download started")
-                            }
+                            onClick={() => handleDownload(item)}
+                            title="Download Description"
                             className="rounded-xl border border-border p-3 transition hover:border-primary hover:text-primary"
                           >
                             <Download size={17} />
@@ -182,10 +259,11 @@ const handleDelete = async (id) => {
 
                           <button
                             onClick={() => handleDelete(item._id)}
+                            title="Delete Product"
                             className="rounded-xl border border-border p-3 transition hover:border-red-500 hover:text-red-500"
-                                  >
-  <Trash2 size={17} />
-</button>
+                          >
+                            <Trash2 size={17} />
+                          </button>
                         </div>
                       </td>
                     </motion.tr>
@@ -194,9 +272,24 @@ const handleDelete = async (id) => {
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-6 py-10 text-center text-muted"
+                      className="px-6 py-16 text-center"
                     >
-                      No generated products found.
+                      <div className="flex flex-col items-center justify-center">
+                        <History
+                          size={56}
+                          className="mb-5 text-gray-400"
+                        />
+
+                        <h3 className="text-2xl font-bold">
+                          No Products Found
+                        </h3>
+
+                        <p className="mt-3 text-gray-500 dark:text-gray-400">
+                          {search
+                            ? "No products match your search."
+                            : "Generate your first AI product description to see it here."}
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 )}
