@@ -13,33 +13,43 @@ const GeneratorSection = () => {
   const [output, setOutput] = useState("");
 
   const handleGenerate = async () => {
-    if (!product.trim() || !category.trim() || !features.trim()) {
-      toast.error("Please fill all fields.");
-      return;
-    }
+  if (loading) return;
 
-    try {
-      setLoading(true);
+  if (!product.trim() || !category.trim() || !features.trim()) {
+    toast.error("Please fill all fields.");
+    return;
+  }
 
-      const response = await api.post("/ai/generate", {
-        productName: product,
-        category,
-        features,
-      });
+  try {
+    setLoading(true);
+    setOutput("");
 
-      setOutput(response.data.description);
+    const response = await api.post("/ai/generate", {
+      productName: product.trim(),
+      category: category.trim(),
+      features: features.trim(),
+    });
 
-      toast.success("Description generated successfully!");
-    } catch (error) {
-      console.error(error);
+    setOutput(
+  response.data.description ||
+  "No description was returned by the AI."
+);
 
-      toast.error("Failed to generate description.");
+    toast.success("Description generated successfully!");
+  } catch (error) {
+    console.error(error);
 
-      setOutput("Something went wrong while generating the description.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const message =
+      error.response?.data?.message ||
+      "Failed to generate description.";
+
+    toast.error(message);
+
+    setOutput("");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -68,9 +78,13 @@ const GeneratorSection = () => {
           placeholder="Bluetooth 5.3, Noise Cancellation, Fast Charging"
         />
 
-        <Button onClick={handleGenerate}>
-          Generate Description
-        </Button>
+        <Button
+  onClick={handleGenerate}
+  disabled={loading}
+  className="w-full"
+>
+  {loading ? "Generating..." : "Generate Description"}
+</Button>
 
       </div>
 
@@ -89,11 +103,14 @@ const GeneratorSection = () => {
           dark:border-gray-700
         "
       >
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader />
-          </div>
-        ) : (
+       {loading ? (
+  <div className="flex h-full flex-col items-center justify-center gap-3">
+    <Loader />
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      AI is generating your description...
+    </p>
+  </div>
+) : (
           <pre className="whitespace-pre-wrap font-sans text-gray-700 dark:text-gray-300">
             {output || "Generated product description will appear here..."}
           </pre>
