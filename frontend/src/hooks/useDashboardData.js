@@ -25,9 +25,24 @@ const useDashboardData = () => {
   }, []);
 
   const stats = useMemo(() => {
-    const categories = new Set(
+    const categoryCount = new Set(
       products.map((p) => p.category)
     ).size;
+
+    const toneCount = new Set(
+      products.map((p) => p.tone)
+    ).size;
+
+    const avgWords =
+      products.length === 0
+        ? 0
+        : Math.round(
+            products.reduce(
+              (sum, product) =>
+                sum + product.description.split(/\s+/).filter(Boolean).length,
+              0
+            ) / products.length
+          );
 
     return [
       {
@@ -36,15 +51,15 @@ const useDashboardData = () => {
       },
       {
         title: "Categories",
-        value: categories,
+        value: categoryCount,
       },
       {
-        title: "Generated",
-        value: products.length,
+        title: "Tones",
+        value: toneCount,
       },
       {
-        title: "Updated",
-        value: products.length,
+        title: "Avg Words",
+        value: avgWords,
       },
     ];
   }, [products]);
@@ -53,8 +68,7 @@ const useDashboardData = () => {
     return [...products]
       .sort(
         (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
+          new Date(b.createdAt) - new Date(a.createdAt)
       )
       .slice(0, 5);
   }, [products]);
@@ -71,8 +85,7 @@ const useDashboardData = () => {
     };
 
     products.forEach((product) => {
-      const day =
-        weekDays[new Date(product.createdAt).getDay()];
+      const day = weekDays[new Date(product.createdAt).getDay()];
       map[day]++;
     });
 
