@@ -48,17 +48,19 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:5173/login",
+    failureRedirect: `${process.env.CLIENT_URL}/login`,
   }),
   (req, res) => {
-  const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id);
 
-  res.redirect(
-    `http://localhost:5173/login?token=${token}&name=${encodeURIComponent(
-      req.user.name
-    )}&email=${encodeURIComponent(req.user.email)}&provider=google`
-  );
-}
+    res.redirect(
+      `${process.env.CLIENT_URL}/login?token=${token}&name=${encodeURIComponent(
+        req.user.name
+      )}&email=${encodeURIComponent(
+        req.user.email
+      )}&provider=google`
+    );
+  }
 );
 
 module.exports = router;
