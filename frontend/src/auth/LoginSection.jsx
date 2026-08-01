@@ -155,7 +155,7 @@ const LoginSection = () => {
               type="button"
               onClick={() => {
                 window.location.href =
-                  "http://localhost:5000/api/auth/google";
+  `${import.meta.env.VITE_API_URL}/auth/google`;
               }}
               className="secondary-btn w-full gap-3"
             >
