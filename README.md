@@ -208,6 +208,14 @@ npm run dev
 
 ---
 
+# 🌐 Live Demo
+
+### Frontend
+https://ai-product-description-generator-green.vercel.app
+
+### Backend API
+https://ai-product-description-generator-tebb.onrender.com
+
 # 🔮 Future Improvements
 
 - AI API Integration
